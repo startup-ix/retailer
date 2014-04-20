@@ -4,6 +4,8 @@ var express = require('express')
 , path = require('path')
 , mysql = require('mysql');
 
+var global_config = require('./configuration.js');
+
 var serverEmitter = require('./emitters.js');
 
 var app = express();
@@ -21,10 +23,10 @@ app.use(express.static(path.join(__dirname, 'public')));
 
 // Send parameters to MySQL Server
 var dbconnection = mysql.createConnection({
-  host:"127.0.0.1",
-  user: "root",
-  password: "",
-  database: "project"
+  host:global_config.db_host,
+  user: global_config.db_user,
+  password: global_config.db_pass,
+  database: global_config.db_name
 });
 
 // Check for an errors at the time of sending parameters
