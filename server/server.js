@@ -43,6 +43,21 @@ dbconnection.connect(function(error){
     }
 });
 
+/**/
+app.use(function (req, res, next) {
+  // Website you wish to allow to connect
+  res.setHeader('Access-Control-Allow-Origin', 'http://localhost:3501');
+  // Request methods you wish to allow
+  res.setHeader('Access-Control-Allow-Methods', 'GET, POST, OPTIONS, PUT, PATCH, DELETE');
+  // Request headers you wish to allow
+  res.setHeader('Access-Control-Allow-Headers', 'X-Requested-With,content-type');
+  // Set to true if you need the website to include cookies in the requests sent
+  // to the API (e.g. in case you use sessions)
+  res.setHeader('Access-Control-Allow-Credentials', true);
+  // Pass to next layer of middleware
+  next();
+});
+
 // Add send sms route
 /*
 app.get('/sendSMS/:message',function(req,res){
@@ -72,9 +87,11 @@ app.post('/sendSMS', function(req,res){
 
 // Send query to MySQL DB on request
 app.get('/:table',function(req, res){
-  var query='SELECT * FROM ' +req.params.table;
-  dbconnection.query( query, function(err, rows, fields)
+  console.log('table man');
+  var query='SELECT * FROM ' + req.params.table;
+  dbconnection.query(query, function(err, rows, fields)
   {
+    console.log('rows', rows);
     // There was an error or not?
     if(err != null)
     {
@@ -89,7 +106,7 @@ app.get('/:table',function(req, res){
 
 function serverStart() {
   http.createServer(app).listen(app.get('port'), function(){
-      console.log('Express server listening on port ' + app.get('port'));
+    console.log('Express server listening on port ' + app.get('port'));
   });
 }
 
