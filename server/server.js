@@ -5,18 +5,27 @@ var express = require('express')
 , mysql = require('mysql')
 , bodyParser = require('body-parser');
 
-var global_config = require('./configuration.js');
+var global_config = require('./configuration.js'),
+   serverEmitter = require('./emitters.js'),
+   app = express();
 
-var serverEmitter = require('./emitters.js');
+/* CORS middleware */
+var allowCrossDomain = function(req, res, next) {
+  res.header('Access-Control-Allow-Origin', '*');
+  res.header('Access-Control-Allow-Methods', 'GET,PUT,POST,DELETE');
+  res.header('Access-Control-Allow-Headers', 'Content-Type');
+  res.header('Access-Control-Max-Age', 60 * 60 * 24 * 365);
+  res.header('Access-Control-Allow-Credentials', 'true');
 
-var app = express();
+  next();
+};
 
-// all environments
 app.set('port', process.env.PORT || 3000);
 app.set('views', __dirname + '/views');
 app.set('view engine', 'jade');
 app.use(express.static(path.join(__dirname, 'public')));
 app.use(bodyParser());
+app.use(allowCrossDomain);
 
 // development only
 //if ('development' == app.get('env')) {
@@ -41,21 +50,6 @@ dbconnection.connect(function(error){
     if (error){
     console.log( "Error on connect: " + error);
     }
-});
-
-/**/
-app.use(function (req, res, next) {
-  // Website you wish to allow to connect
-  res.setHeader('Access-Control-Allow-Origin', 'http://localhost:3501');
-  // Request methods you wish to allow
-  res.setHeader('Access-Control-Allow-Methods', 'GET, POST, OPTIONS, PUT, PATCH, DELETE');
-  // Request headers you wish to allow
-  res.setHeader('Access-Control-Allow-Headers', 'X-Requested-With,content-type');
-  // Set to true if you need the website to include cookies in the requests sent
-  // to the API (e.g. in case you use sessions)
-  res.setHeader('Access-Control-Allow-Credentials', true);
-  // Pass to next layer of middleware
-  next();
 });
 
 // Add send sms route
