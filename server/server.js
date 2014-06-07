@@ -2,7 +2,8 @@ var express = require('express')
 , routes = require('routes')
 , http = require('http')
 , path = require('path')
-, mysql = require('mysql');
+, mysql = require('mysql')
+, bodyParser = require('body-parser');
 
 var global_config = require('./configuration.js');
 
@@ -15,6 +16,7 @@ app.set('port', process.env.PORT || 3000);
 app.set('views', __dirname + '/views');
 app.set('view engine', 'jade');
 app.use(express.static(path.join(__dirname, 'public')));
+app.use(bodyParser());
 
 // development only
 //if ('development' == app.get('env')) {
@@ -42,10 +44,30 @@ dbconnection.connect(function(error){
 });
 
 // Add send sms route
+/*
 app.get('/sendSMS/:message',function(req,res){
   serverEmitter.emit("sendSMSMsg", req.params.message);
   console.log("Emitted sendSMSMsg from server.");
   res.end("SMS Sent.");
+});*/
+
+
+/* Table : SMS,
+   Query: insert into sms values ('Hello Wolrd');
+   @params: message (string) to be sent as SMS. */
+app.post('/sendSMS', function(req,res){
+  console.log('POST /sendSMS, params: ' + req.body.message);
+  var query = 'insert into sms values ("' + req.body.message + '");';
+
+  dbconnection.query(query, function(err) {
+	  if (err !== null) {
+	    res.end("Query error:" + err);
+	  }
+
+		/* message is saved in db, now we send SMS */
+		res.end("SMS Sent.");
+	});
+
 });
 
 // Send query to MySQL DB on request
